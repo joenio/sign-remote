@@ -8,10 +8,18 @@
 # (at your option) any later version.
 
 if [ -z "$1" ] ; then
-    echo "Usage: sign-remote HOSTNAME:PATH"
+    echo "Usage: sign-remote [GPG OPTIONS] HOSTNAME:PATH"
     exit 2
 fi
-url="$1"
+
+ARGV=($@)
+url=${ARGV[-1]}
+unset ARGV[${#ARGV[@]}-1]
+GPG_OPTIONS=${ARGV[@]}
+if [ -z "$GPG_OPTIONS" ]; then
+    GPG_OPTIONS="--batch"
+fi
+
 host=$(echo "$url" | cut -f 1 -d':')
 path=$(echo "$url" | cut -f 2 -d':')
 base=$(dirname "$path")
@@ -27,7 +35,7 @@ trap "rm -f $tmp $sig" EXIT
 echo "I: retrieving file to sign from remote host ..."
 scp "$url" $tmp
 echo "I: signing ..."
-gpg --detach-sign --batch -o $sig $tmp
+gpg --detach-sign $GPG_OPTIONS -o $sig $tmp
 echo "I: sending back signature ..."
 scp $sig "$host":"$path.gpg"
 echo "I: remote signing done."
