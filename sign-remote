@@ -20,8 +20,8 @@ if [ -z "$GPG_OPTIONS" ]; then
     GPG_OPTIONS="--batch"
 fi
 
-host=$(echo "$url" | cut -f 1 -d':')
-path=$(echo "$url" | cut -f 2 -d':')
+host=$(echo "$url" | cut -s -f 1 -d':')
+path=$(echo "$url" | cut -s -f 2 -d':')
 base=$(dirname "$path")
 if [ -z "$host" -o -z "$path" ] ; then
     echo "Malformed remote \"URL\", must follow the \"HOSTNAME:PATH\" convention."
